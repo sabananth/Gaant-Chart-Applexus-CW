@@ -30,7 +30,7 @@
 
             // Load DHTMLX Gantt
             const dhtmlxGanttScript = document.createElement('script');
-            dhtmlxGanttScript.src = 'https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js';
+            dhtmlxGanttScript.src = 'https://github.com/sabananth/Gaant-Chart-Applexus-CW/blob/6e2215e60b56c6f20052963e36425b47a03c71fb/dhtmlxgantt.js';
             dhtmlxGanttScript.onload = () => {
                 this._dhtmlxGanttReady = true;
                 this._renderChart();
