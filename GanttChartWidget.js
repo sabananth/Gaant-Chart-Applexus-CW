@@ -25,7 +25,7 @@
             // Load DHTMLX Gantt CSS
             const dhtmlxGanttCSS = document.createElement('link');
             dhtmlxGanttCSS.rel = 'stylesheet';
-            dhtmlxGanttCSS.href = 'https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.css';
+            dhtmlxGanttCSS.href = 'https://github.com/sabananth/Gaant-Chart-Applexus-CW/blob/e052db81bfb981d5dbd7ab891ba6eb52e6784a25/dhtmlxgantt.css';
             this._shadowRoot.appendChild(dhtmlxGanttCSS);
 
             // Load DHTMLX Gantt
