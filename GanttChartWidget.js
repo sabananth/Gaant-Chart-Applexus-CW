@@ -1,156 +1,168 @@
-(function() {
-    let tmpl = document.createElement('template');
-    tmpl.innerHTML = `
-    <style>
-#chart {
-        border: 1px solid #000;
-        padding: 10px;
-        margin: 10px;
-        width: 100%; 
-        max-width: 95%; 
-        height: 500px;  
-        overflow: hidden; 
-        box-sizing: border-box;  
-        }`
-
-    class GanttChartWidget extends HTMLElement {
-        constructor() {
-            super();
-            console.log('Constructor called');
-            this._shadowRoot = this.attachShadow({mode: 'open'});
-            this._shadowRoot.appendChild(tmpl.content.cloneNode(true));
-            this._props = {};
-            this.tasks = [];
-
-            // Load DHTMLX Gantt CSS
-            const dhtmlxGanttCSS = document.createElement('link');
-            dhtmlxGanttCSS.rel = 'stylesheet';
-            dhtmlxGanttCSS.href = 'https://github.com/sabananth/Gaant-Chart-Applexus-CW/blob/e052db81bfb981d5dbd7ab891ba6eb52e6784a25/dhtmlxgantt.css';
-            this._shadowRoot.appendChild(dhtmlxGanttCSS);
-
-            // Load DHTMLX Gantt
-            const dhtmlxGanttScript = document.createElement('script');
-            dhtmlxGanttScript.src = 'https://github.com/sabananth/Gaant-Chart-Applexus-CW/blob/6e2215e60b56c6f20052963e36425b47a03c71fb/dhtmlxgantt.js';
-            dhtmlxGanttScript.onload = () => {
-                this._dhtmlxGanttReady = true;
-                this._renderChart();
-            };
-            this._shadowRoot.appendChild(dhtmlxGanttScript);
+const dataSource = {
+  tasks: {
+    showlabels: "1",
+    color: "#5D62B5",
+    task: [
+      {
+        processid: "EMP120",
+        start: "07:00:00",
+        end: "16:00:00",
+        label: "Morning Shift"
+      },
+      {
+        processid: "EMP121",
+        start: "14:00:00",
+        end: "22:00:00",
+        label: "Afternoon Shift"
+      },
+      {
+        processid: "EMP122",
+        start: "14:00:00",
+        end: "18:30:00",
+        label: "Half Day"
+      },
+      {
+        processid: "EMP123",
+        start: "07:00:00",
+        end: "16:00:00",
+        label: "Morning Shift"
+      },
+      {
+        processid: "EMP124",
+        start: "14:00:00",
+        end: "22:00:00",
+        label: "Afternoon Shift"
+      },
+      {
+        processid: "EMP125",
+        start: "00:00:00",
+        end: "08:00:00",
+        label: "Early Morning support"
+      },
+      {
+        processid: "EMP126",
+        start: "07:00:00",
+        end: "11:30:00",
+        label: "Half Day"
+      }
+    ]
+  },
+  processes: {
+    fontsize: "12",
+    isbold: "1",
+    align: "Center",
+    headertext: "Employee",
+    headerfontsize: "14",
+    headervalign: "middle",
+    headeralign: "left",
+    process: [
+      {
+        label: "Betty",
+        id: "EMP120"
+      },
+      {
+        label: "William",
+        id: "EMP121"
+      },
+      {
+        label: "Emma",
+        id: "EMP122"
+      },
+      {
+        label: "Oliver",
+        id: "EMP123"
+      },
+      {
+        label: "Lucas",
+        id: "EMP124"
+      },
+      {
+        label: "Alex",
+        id: "EMP125"
+      },
+      {
+        label: "John",
+        id: "EMP126"
+      }
+    ]
+  },
+  categories: [
+    {
+      category: [
+        {
+          start: "00:00:00",
+          end: "23:59:59",
+          label: "Time"
         }
-
-
-
-
-
-
-        // GanttChart methods
-        static get metadata() {
-            console.log('metadata called');
-            return {
-                properties: {
-                    myDataBinding: {
-                        type: "object",
-                        defaultValue: {}
-                    },
-                }
-            };
+      ]
+    },
+    {
+      align: "center",
+      category: [
+        {
+          start: "00:00:00",
+          end: "02:59:59",
+          label: "Midnight"
+        },
+        {
+          start: "03:00:00",
+          end: "05:59:59",
+          label: "3 AM"
+        },
+        {
+          start: "06:00:00",
+          end: "08:59:59",
+          label: "6 AM"
+        },
+        {
+          start: "09:00:00",
+          end: "11:59:59",
+          label: "9 AM"
+        },
+        {
+          start: "12:00:00",
+          end: "14:59:59",
+          label: "12 PM"
+        },
+        {
+          start: "15:00:00",
+          end: "17:59:59",
+          label: "3 PM"
+        },
+        {
+          start: "18:00:00",
+          end: "20:59:59",
+          label: "6 PM"
+        },
+        {
+          start: "21:00:00",
+          end: "23:59:59",
+          label: "9 PM"
         }
-
-        onCustomWidgetBeforeUpdate(changedProperties) {
-            console.log('onCustomWidgetBeforeUpdate called');
-            this._props = { ...this._props, ...changedProperties };
-        }
-
-        onCustomWidgetAfterUpdate(changedProperties) {
-            console.log('onCustomWidgetAfterUpdate called');
-            if ("myDataBinding" in changedProperties) {
-                const dataBinding = changedProperties.myDataBinding;
-                if (dataBinding.state === 'success') {
-                    this._updateData(dataBinding);
-                }
-            }
-        }
-
-_updateData(dataBinding) {
-    console.log('_updateData called');
-    if (dataBinding && Array.isArray(dataBinding.data)) {
-        this.tasks = dataBinding.data.map((row, index) => {
-            if (row.dimensions_0 && row.dimensions_1 && row.dimensions_2 && row.dimensions_3) {
-  
-                
-                console.log('original startDate:', row.dimensions_2.id , 'endDate:', row.dimensions_3.id);  // Log the start and end dates
-             console.log('the rest measure:', row.measures_0.raw, 'the rest dim', row.dimensions_4.id );  // Log the start and end dates
-                
-   const startDate = new Date(row.dimensions_2.id);
-const endDate = new Date(row.dimensions_3.id);
-
-                console.log('original startDate:', startDate, 'endDate:', endDate);  // Log the start and end dates
-       
-                // Check if startDate and endDate are valid dates
-                if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-                    console.error('Invalid date:', row.dimensions_2.id, row.dimensions_3.id);
-                    return null;
-                }
-                // Check if startDate is before endDate
-                if (startDate > endDate) {
-                    console.error('Start date is after end date:', startDate, endDate);
-                    return null;
-                }
-                console.log('startDate:', startDate, 'endDate:', endDate);  // Log the start and end dates
-                return {
-                    id: row.dimensions_0.label,  // Unique id of task
-                    text: row.dimensions_1.label,  // Name of task
-                    start_date: startDate,  // Start date of task
-                    end_date: endDate,  // End date of task
-                    progress: row.measures_0.raw,  // Progress of task in percent
-                    open: row.dimensions_4.id  // Task is open by default
-                };
-            }
-        }).filter(Boolean);  // Filter out any null values
-
-        // Check if all tasks have valid start and end dates
-        for (let task of this.tasks) {
-            if (!task.start_date || !task.end_date) {
-                console.error('Task with null start or end date:', task);
-            }
-        }
-
-        console.log('Tasks:', this.tasks);  // Log the tasks
-
-        this._renderChart();
+      ]
     }
-}
+  ],
+  chart: {
+    dateformat: "dd/mm/yyyy",
+    outputdateformat: "hh12:mn ampm",
+    caption: "Shift Roster for June",
+    subcaption: "Customer Success Team<br>Sensibill",
+    ganttpaneduration: "22",
+    ganttpanedurationunit: "h",
+    scrolltodate: "09:00:00",
+    useverticalscrolling: "0",
+    theme: "candy"
+  }
+};
 
+FusionCharts.ready(function() {
+  var myChart = new FusionCharts({
+    type: "gantt",
+    renderAt: "chart-container",
+    width: "100%",
+    height: "100%",
+    dataFormat: "json",
+    dataSource
+  }).render();
+});
 
-_renderChart() {
-    console.log('_renderChart called');
-    if (this._dhtmlxGanttReady) {
-        const chartElement = this._shadowRoot.getElementById('chart');
-
-
-     // Set fit_tasks to false to enable horizontal scrolling
-        gantt.config.fit_tasks = true;
-         // Configure the Gantt chart to use a monthly scale
-        gantt.config.scale_unit = "month";
-        gantt.config.step = 1;
-        
-        // Initialize the Gantt chart
-        gantt.init(chartElement);
-
-
-        // Load the tasks into the Gantt chart
-        gantt.parse({ data: this.tasks });
-
-        console.log('Gantt chart rendered');
-    }
-}
-
-
-
-
-
-
-    }
-
-    customElements.define('gantt-chart-widget', GanttChartWidget);
-})();
